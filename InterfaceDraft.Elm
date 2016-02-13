@@ -14,13 +14,9 @@ import Text
 type alias Point = { x:Float, y:Float }
 
 
-
-
-
-
-
 main : Element
 main =
   Graphics.Element.leftAligned (Text.italic (Text.fromString "dude..."))
     
 
+-- Compile with: elm make InterfaceDraft.elm --output=int.html
