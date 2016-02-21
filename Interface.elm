@@ -49,7 +49,7 @@ lineStyle = { defaultLine | color = darkPink , width = 5 }
 spacerLineStyle = { defaultLine | color = lightPink , width = 5 }
 
 captionW = 500
-captionH = 70
+captionH = 40
 
 btnW = 70
 btnH = 70
