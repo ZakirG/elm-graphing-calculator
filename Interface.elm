@@ -131,9 +131,11 @@ view inputState (w,h) =
   let resultBar = C.collage captionW captionH [
     stringResult |> toStringMinusQuotes |> strStyle |> E.container captionW captionH E.middle |> C.toForm,
     C.outlined lineStyle (C.rect captionW captionH),
-    captionStrStyle "OUTPUT" |> C.toForm |> C.move (-400,0)] in
+    captionStrStyle "RESULT" |> C.toForm |> C.move (-400,0)] in
   let graphPane = C.collage graphGridW graphGridH [
-    C.outlined lineStyle (C.rect  graphGridW graphGridH)] in
+    C.outlined lineStyle (C.rect  graphGridW graphGridH),
+    captionStrStyle "GRAPH OUTPUT" |> C.toForm |> C.move (-370,400)]
+      in
   let spacerColumn = E.flow E.down <| List.intersperse vspace [tallSquareSpacer, squareSpacer, squareSpacer, squareSpacer, squareSpacer, squareSpacer] in
   let column1 = E.flow E.down <| List.intersperse vspace [tallSquareSpacer, squareSpacer, clearButton, oneButton, fourButton, sevenButton,  squareSpacer] in
   let column2 = E.flow E.down <| List.intersperse vspace [tallSquareSpacer, squareSpacer, pmButton, twoButton, fiveButton, eightButton, squareSpacer] in
