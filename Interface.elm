@@ -11,7 +11,7 @@ import Graphics.Element as E
 import Graphics.Input exposing (button, customButton)
 import Graphics.Collage as C exposing (defaultLine)
 
--- Compile with: elm make InterfaceDraft.elm --output=int.html && open -a Google\ Chrome int.html
+-- Compile with: elm make Interface.elm --output=int.html && open -a Google\ Chrome int.html
 
 
 (gameWidth,gameHeight) = (600,400)
@@ -46,6 +46,7 @@ upstate e i       = case e of
 strStyle : String -> E.Element
 strStyle = T.fromString >> T.height 30 >> E.centered
 lineStyle = { defaultLine | color = darkPink , width = 5 }
+spacerLineStyle = { defaultLine | color = lightPink , width = 5 }
 
 captionW = 500
 captionH = 70
@@ -55,6 +56,7 @@ btnH = 70
 
 lightPink = Color.rgb 255 182 193
 darkPink = Color.rgb 255 50 147
+
 
 -- go implement this properly
 plusOrMin : String -> String
@@ -116,12 +118,16 @@ toStringMinusQuotes s =
 
 
 view i (w,h) =
-  let caption = i |> toStringMinusQuotes |> strStyle |> E.container captionW captionH E.midTop in
-  let column1 = E.flow E.down <| List.intersperse vspace [clearButton, oneButton, fourButton, sevenButton, plusButton] in
-  let column2 = E.flow E.down <| List.intersperse vspace [pmButton, twoButton, fiveButton, eightButton, minButton] in
-  let column3 = E.flow E.down <| List.intersperse vspace [computeButton, threeButton, sixButton, nineButton, divButton] in
-  let column4 = E.flow E.down <| List.intersperse vspace [lparButton, rparButton, zeroButton, decimalButton, timesButton] in
-  let columns = E.flow E.right <| List.intersperse vspace [column1, column2, column3, column4] in
+  let squareSpacer = C.collage btnW btnH [C.outlined spacerLineStyle (C.rect btnW btnH)] in 
+  let caption = C.collage captionW captionH [
+    i |> toStringMinusQuotes |> strStyle |> E.container captionW captionH E.midTop |> C.toForm,
+    C.outlined lineStyle (C.rect captionW captionH)] in
+  let spacerColumn = E.flow E.down <| List.intersperse vspace [squareSpacer, squareSpacer, squareSpacer, squareSpacer, squareSpacer] in
+  let column1 = E.flow E.down <| List.intersperse vspace [squareSpacer, clearButton, oneButton, fourButton, sevenButton, plusButton, squareSpacer] in
+  let column2 = E.flow E.down <| List.intersperse vspace [squareSpacer, pmButton, twoButton, fiveButton, eightButton, minButton, squareSpacer] in
+  let column3 = E.flow E.down <| List.intersperse vspace [squareSpacer, computeButton, threeButton, sixButton, nineButton, divButton, squareSpacer] in
+  let column4 = E.flow E.down <| List.intersperse vspace [squareSpacer, lparButton, rparButton, zeroButton, decimalButton, timesButton, squareSpacer] in
+  let columns = E.flow E.right <| List.intersperse vspace [spacerColumn, column1, column2, column3, column4] in
   let calcGrid = E.flow E.down <| List.intersperse vspace [caption , columns] in
   let fullLayout = E.color lightPink <| E.container w h E.middle calcGrid in
   C.collage w h [(C.toForm fullLayout)]        -- ([C.toForm buttonLayoutLeft, C.toForm buttonLayoutMiddle, C.toForm buttonLayoutRight ])
