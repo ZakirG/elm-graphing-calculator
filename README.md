@@ -5,6 +5,11 @@ Project Team: Benjamin Rohrer, Zakir Gowani
 
 We built a basic graphing calculator application in pure Elm. Basic binary arithmetic operators are supported (+, -, *, / , ^), and a basic unary operator (~, negation). 
 
+Run the application with:
+```
+elm make Interface.elm --output=int.html && open -a Google\ Chrome int.html
+```
+
 ![Snapshot](/imgs/snapshot.jpg?raw=true)
 
 This application was well-suited for a functional language. An example of an advantage: a number of dynamically generated features of the GUI come from mappings of functions onto lists of ranges. 
