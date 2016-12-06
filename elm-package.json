@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "A simple graphing calculator application",
-    "repository": "https://github.com/ZakirG/elm-graphing-calculator",
+    "repository": "https://github.com/ZakirG/elm-graphing-calculator.git",
     "license": "BSD3",
     "source-directories": [
         "."

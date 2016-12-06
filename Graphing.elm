@@ -18,7 +18,7 @@ type alias Range = (Float, Float)
 
 lightPink = Color.rgb 255 182 193
 
-tickStrStyle = T.fromString >> T.height 8 >> T.italic >> T.color Color.white >> E.leftAligned
+tickStrStyle = T.fromString >> T.height 8 >> T.italic >> T.color Color.black >> E.leftAligned
 
 graphGridW = 720
 graphGridH = 567
@@ -30,7 +30,7 @@ graphLineStyle : C.LineStyle
 graphLineStyle =
   { defaultLine         
       | width = 1.0   
-      , color = white
+      , color = black
       , cap   = C.Round   
       , join  = C.Smooth  
   }

@@ -76,12 +76,12 @@ upstate e (graphMode, stringToCompute , stringResult, graphState) =
 
 
 strStyle : String -> E.Element
-strStyle = T.fromString >> T.height 14 >> T.color Color.white >> E.centered
-thickerLineStyle = { defaultLine | color = darkPink , width = 4 }
-lineStyle = { defaultLine | color = darkPink , width = 3 }
+strStyle = T.fromString >> T.height 14 >> T.color Color.black >> E.centered
+thickerLineStyle = { defaultLine | color = Color.black , width = 4 }
+lineStyle = { defaultLine | color = Color.black , width = 3 }
 spacerLineStyle = { defaultLine | color = lightPink , width = 3 }
-buttonLineStyle = { defaultLine | color = darkPink , width = 2 }
-captionStrStyle = T.fromString >> T.height 13 >> T.italic >> T.color Color.white >> E.leftAligned
+buttonLineStyle = { defaultLine | color = Color.black , width = 2 }
+captionStrStyle = T.fromString >> T.height 13 >> T.italic >> T.color Color.black >> E.leftAligned
 
 graphGridW = G.graphGridW
 graphGridH = G.graphGridH
