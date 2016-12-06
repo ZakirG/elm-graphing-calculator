@@ -14,10 +14,12 @@ Project Team:  Zakir Gowani, Benjamin Rohrer
 
 ##### Build and run with:
 ```
+git clone https://github.com/ZakirG/elm-graphing-calculator.git
+cd elm-graphing-calculator/
 elm make Interface.elm --output=int.html
 open -a Google\ Chrome int.html
 ```
-Replace "Google\ Chrome" with your preferred browser.
+And replace "Google\ Chrome" with your preferred browser. You may be prompted to install Elm. 
 
 
 This application was well-suited for a functional language.
@@ -25,3 +27,5 @@ This application was well-suited for a functional language.
 A number of dynamically generated features of the GUI come from mappings of functions onto lists of ranges. 
 
 For example, the graph ticks are generated on the fly, building lists of graphics elements from lists of numbers.
+
+This application does not use CSS; all UI features are generated functionally with Elm.
