@@ -1,6 +1,7 @@
 module Interface where
 
 import Parsing as P
+import Graphing as G
 import Random
 import String
 import Color exposing (..)
@@ -11,57 +12,88 @@ import Signal exposing (Mailbox, mailbox)
 import Graphics.Element as E
 import Graphics.Input exposing (button, customButton)
 import Graphics.Collage as C exposing (defaultLine)
+import Functions as F
+import Graphics.Input.Field exposing (..)
+import Graphics.Input exposing (..)
 
--- Compile with: elm make Interface.elm --output=int.html && open -a Google\ Chrome int.html
 
 
-(gameWidth,gameHeight) = (600,400)
-(halfWidth,halfHeight) = (300,200)
+-- elm make Interface.elm --output=int.html && open -a Google\ Chrome int.html
 
-type alias State  = (String, String)
-type CalcEvent = DEL | PLU | MIN | DIV | TIM | PM | DEC | LPAR | RPAR | Zero | One | Two | Three| Four | Five | Six | Seven | Eight | Nine | Compute | Clear
+type alias State  = (Bool, String, String, G.GraphState)
 
-initInputState = ("","")
-upstate e (stringToCompute , stringResult) = case e of
-                      PLU  -> (stringToCompute ++ " + ", stringResult)
-                      MIN  -> (stringToCompute ++ " - ", stringResult)
-                      DIV  -> (stringToCompute ++ " / ", stringResult)
-                      TIM  -> (stringToCompute ++ " * ", stringResult)
-                      Clear -> ("", "")
-                      Zero -> (stringToCompute ++ "0", stringResult)
-                      One   -> (stringToCompute ++ "1", stringResult)
-                      Two   -> (stringToCompute ++ "2", stringResult)
-                      Three   -> (stringToCompute ++ "3", stringResult)
-                      Four   -> (stringToCompute ++ "4", stringResult)
-                      Five   -> (stringToCompute ++ "5", stringResult)
-                      Six   -> (stringToCompute ++ "6", stringResult)
-                      Seven   -> (stringToCompute ++ "7", stringResult)
-                      Eight   -> (stringToCompute ++ "8", stringResult)
-                      Nine   -> (stringToCompute ++ "9", stringResult)
-                      Compute -> ("", toString (P.parseStringToCompute stringToCompute))
-                      LPAR -> (stringToCompute ++ " ( ", stringResult)
-                      RPAR -> (stringToCompute ++ " ) ", stringResult)
-                      PM -> (P.plusOrMin stringToCompute, stringResult)
-                      DEC -> (stringToCompute ++ ".", stringResult)
-                      DEL -> (P.backspace stringToCompute, stringResult)
+type CalcEvent =  ZOOMIN | ZOOMOUT |  CARAT | INV | SRT | XVAR | YEQ | ANS | DEL | PLU | MIN | DIV | TIM | PM | DEC | LPAR | RPAR |
+                 Zero | One | Two | Three| Four | Five | Six | Seven | Eight | Nine | Compute | Clear
+
+
+initInputState = (False, "", "", G.initGraphState)
+
+upstate e (graphMode, stringToCompute , stringResult, graphState) = 
+  case e of
+    PLU  -> (graphMode, stringToCompute ++ " + ", stringResult, graphState)
+    MIN  -> (graphMode, stringToCompute ++ " - ", stringResult, graphState)
+    DIV  -> (graphMode, stringToCompute ++ " / ", stringResult, graphState)
+    TIM  -> (graphMode, stringToCompute ++ " * ", stringResult, graphState)
+    Clear ->  (False, "", "", G.graphUpstate G.CLEAR graphState)
+    Zero -> (graphMode, stringToCompute ++ "0", stringResult, graphState)
+    One   -> (graphMode, stringToCompute ++ "1", stringResult, graphState)
+    Two   -> (graphMode, stringToCompute ++ "2", stringResult, graphState)
+    Three   -> (graphMode, stringToCompute ++ "3", stringResult, graphState)
+    Four   -> (graphMode, stringToCompute ++ "4", stringResult, graphState)
+    Five   -> (graphMode, stringToCompute ++ "5", stringResult, graphState)
+    Six   -> (graphMode, stringToCompute ++ "6", stringResult, graphState)
+    Seven   -> (graphMode, stringToCompute ++ "7", stringResult, graphState)
+    Eight   -> (graphMode, stringToCompute ++ "8", stringResult, graphState)
+    Nine   -> (graphMode, stringToCompute ++ "9", stringResult, graphState)
+    Compute -> case graphMode of
+      True -> (graphMode, stringToCompute, "", G.graphUpstate (G.GRAPH stringToCompute (snd graphState)) graphState)
+      False -> (graphMode, "", F.stringToResult stringToCompute, graphState) 
+    LPAR -> (graphMode, stringToCompute ++ "( ", stringResult, graphState)
+    RPAR -> (graphMode, stringToCompute ++ " ) ", stringResult, graphState)
+    PM -> (graphMode, P.plusOrMin stringToCompute, stringResult, graphState)
+    DEC -> (graphMode, stringToCompute ++ ".", stringResult, graphState)
+    DEL -> (graphMode, P.backspace stringToCompute, stringResult, graphState)
+    ANS -> (graphMode, stringToCompute ++ " " ++ stringResult, stringResult, graphState)
+    YEQ -> ((not graphMode)||(P.stringContainsX stringToCompute), stringToCompute, stringResult, graphState)
+    XVAR -> (True, stringToCompute ++ "x", stringResult, graphState)
+    CARAT -> (graphMode, stringToCompute ++ " ^ ", stringResult, graphState)
+    INV -> (graphMode, stringToCompute ++ " ^ ( -1 )", stringResult, graphState)
+    SRT -> (graphMode, stringToCompute ++ " ^ ( 1 / 2 )", stringResult, graphState)
+    ZOOMIN -> let (left, right) = snd graphState in
+      if right < 2.0 then 
+        (graphMode, stringToCompute, "", graphState) 
+      else 
+        let newRange = (left+2, right-2) in
+        (graphMode, stringToCompute, "", G.graphUpstate (G.GRAPH stringToCompute newRange) graphState)
+    ZOOMOUT -> let (left, right) = snd graphState in
+      if right > 15.0 then 
+        (graphMode, stringToCompute, "", graphState) 
+      else 
+        let newRange = (left-2, right+2) in
+        (graphMode, stringToCompute, "", G.graphUpstate (G.GRAPH stringToCompute newRange) graphState)
+
 
 
 
 strStyle : String -> E.Element
-strStyle = T.fromString >> T.height 25 >> T.color Color.white >> E.centered
-lineStyle = { defaultLine | color = darkPink , width = 5 }
-spacerLineStyle = { defaultLine | color = lightPink , width = 5 }
-captionStrStyle = T.fromString >> T.height 20 >> T.italic >> T.color Color.white >> E.leftAligned
+strStyle = T.fromString >> T.height 14 >> T.color Color.white >> E.centered
+thickerLineStyle = { defaultLine | color = darkPink , width = 4 }
+lineStyle = { defaultLine | color = darkPink , width = 3 }
+spacerLineStyle = { defaultLine | color = lightPink , width = 3 }
+buttonLineStyle = { defaultLine | color = darkPink , width = 2 }
+captionStrStyle = T.fromString >> T.height 13 >> T.italic >> T.color Color.white >> E.leftAligned
 
-graphGridW = 900
-graphGridH = 850
+graphGridW = G.graphGridW
+graphGridH = G.graphGridH
 
+captionW = 720
+captionH = 47
 
-captionW = 900
-captionH = 70
+btnW = 44
+btnH = 44
 
-btnW = 70
-btnH = 70
+arrowBtnW = 94
+arrowBtnH = 47
 
 lightPink = Color.rgb 255 182 193
 darkPink = Color.rgb 255 50 147
@@ -73,12 +105,18 @@ type alias Input bool =
     , delta : Time.Time
     }
 
+arrowButtonShape : Float -> Float -> C.Shape
+arrowButtonShape size stretchFactor = 
+  let sizeify = \(a,b) -> (size*a, size*b) in
+  let stretchify = \(a,b) -> (stretchFactor*a, b) in
+  let sizeUp = stretchify << sizeify in
+  C.polygon (List.map sizeUp [(0.5,0.866), (1,0), (0.5,-0.866), (-0.5,-0.866), (-1,0), (-0.5, 0.866)])
 
 myButton msg s =
   let drawButton c =
     C.collage btnW btnH
-       [ C.filled c  (C.ngon 6 32)
-       , C.outlined lineStyle (C.ngon 6 32)
+       [ C.filled c  (C.ngon 6 21)
+       , C.outlined buttonLineStyle (C.ngon 6 21)
        , strStyle s |> C.toForm
     ]
   in
@@ -86,6 +124,46 @@ myButton msg s =
     (drawButton lightPink)
     (drawButton darkPink)
     (drawButton Color.grey)
+
+arrowButton msg s = 
+  let drawButton c =
+    C.collage arrowBtnW arrowBtnH
+       [ C.filled c  (arrowButtonShape 20 2)
+       , C.outlined lineStyle (arrowButtonShape 20 2)
+       , strStyle s |> C.toForm
+    ]
+  in
+  customButton msg
+    (drawButton lightPink)
+    (drawButton darkPink)
+    (drawButton Color.grey)
+
+rectButton msg s = 
+  let drawButton c =
+    C.collage 50 30
+       [ C.filled c  (C.rect 50 30)
+       , C.outlined thickerLineStyle (C.rect 50 30)
+       , strStyle s |> C.toForm
+    ]
+  in
+  customButton msg
+    (drawButton lightPink)
+    (drawButton darkPink)
+    (drawButton Color.grey)
+    
+bigButton msg s = 
+  let drawButton c =
+    C.collage 100 60
+       [ C.filled c  (C.rect 100 60)
+       , C.outlined thickerLineStyle (C.rect 100 60)
+       , strStyle s |> C.toForm
+    ]
+  in
+  customButton msg
+    (drawButton lightPink)
+    (drawButton darkPink)
+    (drawButton Color.grey)
+
 
 buttonMailbox : Mailbox CalcEvent
 buttonMailbox = mailbox Clear
@@ -104,14 +182,21 @@ sixButton   = myButton (Signal.message buttonMailbox.address Six) "6"
 sevenButton   = myButton (Signal.message buttonMailbox.address Seven) "7"
 eightButton   = myButton (Signal.message buttonMailbox.address Eight) "8"
 nineButton   = myButton (Signal.message buttonMailbox.address Nine) "9"
-clearButton = myButton (Signal.message buttonMailbox.address Clear) "AC"
-computeButton = myButton (Signal.message buttonMailbox.address Compute) "="
+clearButton = myButton (Signal.message buttonMailbox.address Clear) "ac"
+computeButton = bigButton (Signal.message buttonMailbox.address Compute) "> compute <"
 pmButton = myButton (Signal.message buttonMailbox.address PM) "+/-"
 decimalButton = myButton (Signal.message buttonMailbox.address DEC) "."
 lparButton = myButton (Signal.message buttonMailbox.address LPAR) "("
 rparButton = myButton (Signal.message buttonMailbox.address RPAR) ")"
 delButton = myButton (Signal.message buttonMailbox.address DEL) "del"
-
+ansButton = rectButton (Signal.message buttonMailbox.address ANS) "ans"
+yeqButton = rectButton (Signal.message buttonMailbox.address YEQ) "y = "
+xButton = rectButton (Signal.message buttonMailbox.address XVAR) "x"
+caratButton = myButton (Signal.message buttonMailbox.address CARAT) "^"
+invButton = myButton (Signal.message buttonMailbox.address INV) "inv"
+sqrtButton = myButton (Signal.message buttonMailbox.address SRT) "sqrt"
+zoomInButton = rectButton (Signal.message buttonMailbox.address ZOOMIN) "+"
+zoomOutButton = rectButton (Signal.message buttonMailbox.address ZOOMOUT) "-"
 
 vspace = E.spacer 5 5
 
@@ -119,35 +204,62 @@ toStringMinusQuotes : String -> String
 toStringMinusQuotes s =
   String.dropRight 1 (String.dropLeft 1 (toString s))
 
+gmString : Bool -> String
+gmString b = 
+  if (not b) then 
+    "INPUT:" ++ "  "
+  else 
+    "         INPUT:" ++ "  " ++ "    y ="
 
 view inputState (w,h) =
-  let (stringToCompute, stringResult) = inputState in
+  let (graphModeToggle, stringToCompute, stringResult, graphState) = inputState in
+  let graphModeStr = (gmString graphModeToggle) in
   let squareSpacer = C.collage btnW btnH [C.outlined spacerLineStyle (C.rect 60 70)] in 
+  let smallSpacer = C.collage 70 40 [C.outlined spacerLineStyle (C.rect 70 40)] in 
+  let tinySpacer = C.collage 20 40 [C.outlined spacerLineStyle (C.rect 20 40)] in 
   let tallSquareSpacer = C.collage btnW btnH [C.outlined spacerLineStyle (C.rect 60 300)] in 
   let toCompute = C.collage captionW captionH [ 
     stringToCompute |> toStringMinusQuotes |> strStyle |> E.container captionW captionH E.middle |> C.toForm,
     C.outlined lineStyle (C.rect captionW captionH),
-     captionStrStyle "INPUT" |> C.toForm |> C.move (-400,0)] in
+     captionStrStyle (graphModeStr) |> C.toForm |> C.move (-327,0)] in
   let resultBar = C.collage captionW captionH [
     stringResult |> toStringMinusQuotes |> strStyle |> E.container captionW captionH E.middle |> C.toForm,
     C.outlined lineStyle (C.rect captionW captionH),
-    captionStrStyle "RESULT" |> C.toForm |> C.move (-400,0)] in
+    captionStrStyle "RESULT" |> C.toForm |> C.move (-327,0)] in
+  
+  let graph = G.graphPoints graphState in
+  
   let graphPane = C.collage graphGridW graphGridH [
-    C.outlined lineStyle (C.rect  graphGridW graphGridH),
-    captionStrStyle "GRAPH OUTPUT" |> C.toForm |> C.move (-370,400)]
-      in
-  let spacerColumn = E.flow E.down <| List.intersperse vspace [tallSquareSpacer, squareSpacer, squareSpacer, squareSpacer, squareSpacer, squareSpacer] in
-  let column1 = E.flow E.down <| List.intersperse vspace [tallSquareSpacer, squareSpacer, clearButton, oneButton, fourButton, sevenButton,  squareSpacer] in
-  let column2 = E.flow E.down <| List.intersperse vspace [tallSquareSpacer, squareSpacer, pmButton, twoButton, fiveButton, eightButton, squareSpacer] in
-  let column3 = E.flow E.down <| List.intersperse vspace [tallSquareSpacer, squareSpacer, computeButton, threeButton, sixButton, nineButton, squareSpacer] in
-  let column4 = E.flow E.down <| List.intersperse vspace [tallSquareSpacer, squareSpacer, lparButton, rparButton, decimalButton, zeroButton, squareSpacer] in
-  let column5 = E.flow E.down <| List.intersperse vspace [tallSquareSpacer,  delButton,plusButton, minButton, divButton, timesButton, squareSpacer] in
-  let columns = C.collage 500 1000 [ 
-    C.outlined lineStyle (C.rect 500 1000),
-    C.toForm <| E.flow E.right <| List.intersperse vspace [spacerColumn, column1, column2, column3, column4, column5, spacerColumn]
+    graph |> C.move (20,-20),
+    G.drawAxes (snd graphState) |> C.move (20,-20),
+    C.outlined lineStyle (C.rect graphGridW graphGridH),
+    captionStrStyle "GRAPH OUTPUT:" |> C.toForm |> C.move (-305,267)] in
+  
+  
+  let spacerColumn = E.flow E.down <| List.intersperse vspace [squareSpacer, squareSpacer, squareSpacer, squareSpacer] in
+  let topRow = E.flow E.right <| List.intersperse vspace [tinySpacer, tinySpacer, yeqButton, xButton, ansButton] in 
+  let secondRow = E.flow E.right <| List.intersperse vspace [tinySpacer, clearButton, delButton,lparButton,rparButton ] in 
+  
+  let column1 = E.flow E.down <| List.intersperse vspace [pmButton, oneButton, fourButton] in
+  let column2 = E.flow E.down <| List.intersperse vspace [invButton,  twoButton, fiveButton] in
+  let column3 = E.flow E.down <| List.intersperse vspace [sqrtButton,threeButton, sixButton] in
+  let column4 = E.flow E.down <| List.intersperse vspace [caratButton, plusButton, zeroButton] in
+  let column5 = E.flow E.down <| List.intersperse vspace [ minButton, divButton, timesButton] in
+  let columns = E.flow E.right <| List.intersperse vspace [column1, column2, column3, column4, column5] in
+  
+  let penultimateRow = E.flow E.right <| List.intersperse vspace [tinySpacer,  sevenButton,  eightButton, nineButton,decimalButton ] in 
+  let bottomRow = E.flow E.right <| List.intersperse vspace [tinySpacer, tinySpacer, tinySpacer, computeButton] in 
+
+  
+  let rangeString = "Range: " ++ "(" ++ toString (fst (snd graphState)) ++ " , " ++ toString (snd (snd graphState)) ++ ")" in
+  let zoomRow = E.flow E.right <| List.intersperse vspace [ zoomOutButton, tinySpacer, captionStrStyle rangeString, tinySpacer, zoomInButton] in
+  
+  let buttonGrid = C.collage 400 671 [ 
+    C.outlined lineStyle (C.rect 400 671),
+    C.toForm <| E.flow E.down <| List.intersperse vspace [topRow, secondRow, columns, penultimateRow, bottomRow, zoomRow]
     ] in
   let outputGrid = E.flow E.down <| List.intersperse vspace [toCompute , resultBar, graphPane] in
-  let calcGrid = E.flow E.right <| List.intersperse vspace [columns, outputGrid] in
+  let calcGrid = E.flow E.right <| List.intersperse vspace [buttonGrid, outputGrid] in
   let fullLayout = E.color lightPink <| E.container w h E.middle calcGrid in
   C.collage w h [(C.toForm fullLayout)]
 

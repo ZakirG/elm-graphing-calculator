@@ -19,7 +19,7 @@ pickOutElem l =
   case l of
     [x] -> x
     x::y::rest -> x
-    _ -> Debug.crash "list failed"
+    _ -> Debug.crash "pickOutElem failed"
 
 plusOrMin : String -> String
 plusOrMin s = 
@@ -27,25 +27,27 @@ plusOrMin s =
   let n = String.length s in 
   let lastElem = List.drop ((List.length fullList) - 1) fullList in
   let lastElemStr = pickOutElem lastElem in 
-  if lastElemStr == "-" then 
+  if lastElemStr == "~" then 
     String.slice 0 (n-1) s
-  else String.join " " (List.append fullList ["-"])
+  else String.join " " (List.append fullList ["~"])
 
 negateString : String -> String
 negateString s =
   let n = String.length s in
-  if String.startsWith "-" s then "-" ++ s
+  if String.startsWith "~" s then "~" ++ s
   else String.slice 1 (n-1) s
 
 
 backspace : String -> String
 backspace s = 
   let n = String.length s in
-  let fullList = (String.split "" s) in
-  let lastElem = List.drop ((List.length fullList) - 1) fullList in
-  let lastElemStr = pickOutElem lastElem in 
-  if lastElemStr == " " then String.slice 0 (n-2) s else
-  String.slice 0 (n-1) s
+  if n <= 0 then s
+  else
+    let fullList = (String.split "" s) in
+    let lastElem = List.drop ((List.length fullList) - 1) fullList in
+    let lastElemStr = pickOutElem lastElem in 
+    if lastElemStr == " " then String.slice 0 (n-2) s else
+    String.slice 0 (n-1) s
 
 parseStringToCompute : String -> List String
 parseStringToCompute s =
@@ -53,16 +55,9 @@ parseStringToCompute s =
   List.filter isNotSpace (String.split " " s)
 
 
-
-
-
-
-
-
-
-
-
-
+stringContainsX : String -> Bool
+stringContainsX s = 
+  String.contains "x" s
 
 
 

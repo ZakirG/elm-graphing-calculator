@@ -1,0 +1,36 @@
+-------------------------------------------------------------------------------------------------------------------------------
+----------------------------------- Final Report - Virtual Graphing Calculator -----------------------------
+-------------------------------------------------------------------------------------------------------------------------------
+--------------------------------- Group: Benjamin Rohrer (bjr), Zakir Gowani (zgowani) --------------------
+-------------------------------------------------------------------------------------------------------------------------------
+RUN OUR APPLICATION WITH:
+elm make Interface.elm --output=int.html && open -a Google\ Chrome int.html
+Of course, replace "Google\ Chrome" with your preferred browser.
+
+
+Overview: 
+	We have built a basic graphing calculator application in pure Elm. Basic binary arithmetic operators are supported (+, -, *, / , ^), and a basic unary operator (~, negation). Trig functions are not supported, as we chose to focus our efforts on graphing. The range is customizable, although limited for performance reasons. 
+This application was well-suited for a functional language. An example of an advantage: a number of dynamically generated features of the GUI come from mappings of functions onto lists of ranges. The graph ticks are generated on the fly, building lists of graphics elements from lists of numbers; the plot itself is the result of mapping a domain to a list of tuples, the second element of each tuple being the output of the function application. Another advantage: built-in case expressions made the design of the recursive evaluation logic very straightforward. 
+
+Newly added GUI capabilities:
+	- The compute function now runs the parsing and evaluation functions found in Parsing.elm and Functions.elm and displays the output in either the OUTPUT panel (if graph mode is toggled off, described below) or in the graphing window
+	- Graph mode toggle: when the “y=” string is shown in the INPUT panel, graph mode is toggled on; this means that the string in the INPUT panel will be graphed. Graph mode can either be toggled using the “y=” button or by including the variable x in the INPUT string.
+	- A range interval is shown below the button layout; the buttons to either side either zoom in or zoom out on the displayed graph. We cap the maximum range at (-17,17); we cap the minimum range at (-1,1).
+	- A graph is now shown in the graphing panel! There are two axes with corresponding labelled ticks; these ticks may be separated by larger intervals depending on the range chosen (fewer ticks for larger ranges).
+	- A few new buttons have been added: the “ans” button which places the output string into the INPUT panel, the “y=”, “x”, “inv”, “sqrt” buttons, and the range changing buttons. We changed our “=” button to a compute button, to more explicitly show that the same button processes input and graphs.
+
+Originally present in the progress update:
+- The AC button clears the input window
+- All number buttons place a number in the input window
+- The +, -, /, *, ., (, and ) buttons place the corresponding characters in the input window
+- The +/- button adds a minus sign (now denoted ~) in front of the next number to be added, or removes the minus sign present if there is one already
+- The del button deletes the most recently inputted character from the input pane
+
+
+Newly implemented evaluation capabilities:
+
+Evaluation now supports 
+Computation respects the order of operations 
+Negation of variables or parenthetical statements via the “~” operator
+
+

@@ -1,0 +1,355 @@
+Elm.Functions = Elm.Functions || {};
+Elm.Functions.make = function (_elm) {
+   "use strict";
+   _elm.Functions = _elm.Functions || {};
+   if (_elm.Functions.values) return _elm.Functions.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Parsing = Elm.Parsing.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var appendEvalStack = F2(function (_p1,_p0) {
+      var _p2 = _p1;
+      var _p3 = _p0;
+      return {ctor: "_Tuple2",_0: A2($List.append,_p2._0,_p3._0),_1: A2($List.append,_p2._1,_p3._1)};
+   });
+   var $eval = F2(function (f,x) {
+      var _p4 = f;
+      switch (_p4.ctor)
+      {case "NUM": return _p4._0;
+         case "NEG": return -1 * A2($eval,_p4._0,x);
+         case "VAR": return x;
+         case "ADD": return A2($eval,_p4._0,x) + A2($eval,_p4._1,x);
+         case "SUB": return A2($eval,_p4._0,x) - A2($eval,_p4._1,x);
+         case "MUL": return A2($eval,_p4._0,x) * A2($eval,_p4._1,x);
+         case "DIV": var _p6 = _p4._1;
+           var div = A2($eval,_p6,x);
+           var _p5 = div;
+           if (_p5 === 0) {
+                 return 0;
+              } else {
+                 return A2($eval,_p4._0,x) / A2($eval,_p6,x);
+              }
+         default: return Math.pow(A2($eval,_p4._0,x),A2($eval,_p4._1,x));}
+   });
+   var EVAR = {ctor: "EVAR"};
+   var EVAL = function (a) {    return {ctor: "EVAL",_0: a};};
+   var NEVAL = function (a) {    return {ctor: "NEVAL",_0: a};};
+   var STACK = function (a) {    return {ctor: "STACK",_0: a};};
+   var openPar = F3(function (d,neg,_p7) {
+      var _p8 = _p7;
+      var _p15 = _p8._1;
+      var _p14 = _p8._0;
+      if (_U.cmp(d,0) > 0) {
+            var _p9 = _p14;
+            if (_p9.ctor === "::") {
+                  var _p12 = _p9._1;
+                  var _p10 = _p9._0;
+                  _v6_2: do {
+                     switch (_p10.ctor)
+                     {case "STACK": var nes = A3(openPar,d - 1,neg,_p10._0);
+                          return {ctor: "_Tuple2",_0: A2($List._op["::"],STACK(nes),_p12),_1: _p15};
+                        case "NEVAL": if (_p10._0.ctor === "STACK") {
+                                var nes = A3(openPar,d - 1,neg,_p10._0._0);
+                                return {ctor: "_Tuple2",_0: A2($List._op["::"],NEVAL(STACK(nes)),_p12),_1: _p15};
+                             } else {
+                                break _v6_2;
+                             }
+                        default: break _v6_2;}
+                  } while (false);
+                  return _U.crashCase("Functions",{start: {line: 81,column: 17},end: {line: 88,column: 74}},_p10)("Invalid depth in openPar");
+               } else {
+                  return _U.crashCase("Functions",{start: {line: 79,column: 9},end: {line: 89,column: 65}},_p9)("Empty list in openPar");
+               }
+         } else if (neg) return {ctor: "_Tuple2",_0: A2($List._op["::"],NEVAL(STACK({ctor: "_Tuple2",_0: _U.list([]),_1: _U.list([])})),_p14),_1: _p15};
+         else return {ctor: "_Tuple2",_0: A2($List._op["::"],STACK({ctor: "_Tuple2",_0: _U.list([]),_1: _U.list([])}),_p14),_1: _p15};
+   });
+   var addEvalStack = F3(function (d,felem,_p16) {
+      var _p17 = _p16;
+      var _p25 = _p17._1;
+      var _p24 = _p17._0;
+      if (_U.cmp(d,0) > 0) {
+            var _p18 = _p24;
+            if (_p18.ctor === "::") {
+                  var _p21 = _p18._1;
+                  var _p19 = _p18._0;
+                  _v9_2: do {
+                     switch (_p19.ctor)
+                     {case "STACK": var nes = A3(addEvalStack,d - 1,felem,_p19._0);
+                          return {ctor: "_Tuple2",_0: A2($List._op["::"],STACK(nes),_p21),_1: _p25};
+                        case "NEVAL": if (_p19._0.ctor === "STACK") {
+                                var nes = A3(addEvalStack,d - 1,felem,_p19._0._0);
+                                return {ctor: "_Tuple2",_0: A2($List._op["::"],NEVAL(STACK(nes)),_p21),_1: _p25};
+                             } else {
+                                break _v9_2;
+                             }
+                        default: break _v9_2;}
+                  } while (false);
+                  return _U.crashCase("Functions",{start: {line: 101,column: 17},end: {line: 108,column: 79}},_p19)("Invalid depth in addEvalStack");
+               } else {
+                  return _U.crashCase("Functions",{start: {line: 99,column: 9},end: {line: 109,column: 70}},_p18)("Empty list in addEvalStack");
+               }
+         } else {
+            var _p23 = felem;
+            if (_p23.ctor === "ELEM_OP") {
+                  return {ctor: "_Tuple2",_0: _p24,_1: A2($List._op["::"],_p23._0,_p25)};
+               } else {
+                  return {ctor: "_Tuple2",_0: A2($List._op["::"],_p23._0,_p24),_1: _p25};
+               }
+         }
+   });
+   var regroup = function (_p26) {
+      regroup: while (true) {
+         var _p27 = _p26;
+         var _p36 = _p27._1;
+         var _p35 = _p27._0;
+         var _p28 = _p35;
+         if (_p28.ctor === "::" && _p28._1.ctor === "::") {
+               var _p34 = _p28._1._1;
+               var regeval1 = regroupEval(_p28._0);
+               var regeval2 = regroupEval(_p28._1._0);
+               var _p29 = _p36;
+               if (_p29.ctor === "::") {
+                     var _p33 = _p29._1;
+                     var _p32 = _p29._0;
+                     var _p30 = _p32;
+                     switch (_p30.ctor)
+                     {case "OP_MUL": var _v15 = {ctor: "_Tuple2"
+                                                ,_0: A2($List._op["::"],STACK({ctor: "_Tuple2",_0: _U.list([regeval1,regeval2]),_1: _U.list([_p32])}),_p34)
+                                                ,_1: _p33};
+                          _p26 = _v15;
+                          continue regroup;
+                        case "OP_DIV": var _v16 = {ctor: "_Tuple2"
+                                                  ,_0: A2($List._op["::"],STACK({ctor: "_Tuple2",_0: _U.list([regeval1,regeval2]),_1: _U.list([_p32])}),_p34)
+                                                  ,_1: _p33};
+                          _p26 = _v16;
+                          continue regroup;
+                        default: var _p31 = regroup({ctor: "_Tuple2",_0: A2($List._op["::"],regeval2,_p34),_1: _p33});
+                          var regevals = _p31._0;
+                          var regops = _p31._1;
+                          return {ctor: "_Tuple2",_0: A2($List._op["::"],regeval1,regevals),_1: A2($List._op["::"],_p32,regops)};}
+                  } else {
+                     return {ctor: "_Tuple2",_0: _p35,_1: _p36};
+                  }
+            } else {
+               return {ctor: "_Tuple2",_0: _p35,_1: _p36};
+            }
+      }
+   };
+   var regroupEval = function (e) {    var _p37 = e;if (_p37.ctor === "STACK") {    return STACK(regroup(_p37._0));} else {    return e;}};
+   var EXP = F2(function (a,b) {    return {ctor: "EXP",_0: a,_1: b};});
+   var DIV = F2(function (a,b) {    return {ctor: "DIV",_0: a,_1: b};});
+   var MUL = F2(function (a,b) {    return {ctor: "MUL",_0: a,_1: b};});
+   var SUB = F2(function (a,b) {    return {ctor: "SUB",_0: a,_1: b};});
+   var ADD = F2(function (a,b) {    return {ctor: "ADD",_0: a,_1: b};});
+   var composeFunction = F3(function (op,f1,f2) {
+      var _p38 = op;
+      switch (_p38.ctor)
+      {case "OP_ADD": return $Result.Ok(A2(ADD,f1,f2));
+         case "OP_SUB": return $Result.Ok(A2(SUB,f1,f2));
+         case "OP_MUL": return $Result.Ok(A2(MUL,f1,f2));
+         case "OP_DIV": return $Result.Ok(A2(DIV,f1,f2));
+         case "OP_EXP": return $Result.Ok(A2(EXP,f1,f2));
+         default: return $Result.Err("Unimplemented function or operator");}
+   });
+   var VAR = {ctor: "VAR"};
+   var NEG = function (a) {    return {ctor: "NEG",_0: a};};
+   var NUM = function (a) {    return {ctor: "NUM",_0: a};};
+   var evaluableToFunction = function ($eval) {
+      var _p39 = $eval;
+      switch (_p39.ctor)
+      {case "STACK": return stackToFunction(_p39._0);
+         case "EVAL": return $Result.Ok(NUM(_p39._0));
+         case "EVAR": return $Result.Ok(VAR);
+         default: var r = evaluableToFunction(_p39._0);
+           var _p40 = r;
+           if (_p40.ctor === "Ok") {
+                 return $Result.Ok(NEG(_p40._0));
+              } else {
+                 return $Result.Err(_p40._0);
+              }}
+   };
+   var stackToFunction = function (_p41) {
+      var _p42 = _p41;
+      var _p43 = _p42._0;
+      if (_p43.ctor === "::") {
+            var r2 = evaluableToFunction(_p43._0);
+            var _p44 = r2;
+            if (_p44.ctor === "Err") {
+                  return $Result.Err(_p44._0);
+               } else {
+                  var _p47 = _p44._0;
+                  var _p45 = _p42._1;
+                  if (_p45.ctor === "::") {
+                        var r1 = stackToFunction({ctor: "_Tuple2",_0: _p43._1,_1: _p45._1});
+                        var _p46 = r1;
+                        if (_p46.ctor === "Ok") {
+                              return A3(composeFunction,_p45._0,_p46._0,_p47);
+                           } else {
+                              return $Result.Err(_p46._0);
+                           }
+                     } else {
+                        return $Result.Ok(_p47);
+                     }
+               }
+         } else {
+            return $Result.Err("Unbalanced operands/operators");
+         }
+   };
+   var ELEM_OP = function (a) {    return {ctor: "ELEM_OP",_0: a};};
+   var ELEM_EVAL = function (a) {    return {ctor: "ELEM_EVAL",_0: a};};
+   var OP_NPAR = {ctor: "OP_NPAR"};
+   var OP_RPAR = {ctor: "OP_RPAR"};
+   var OP_LPAR = {ctor: "OP_LPAR"};
+   var OP_EXP = {ctor: "OP_EXP"};
+   var OP_DIV = {ctor: "OP_DIV"};
+   var OP_MUL = {ctor: "OP_MUL"};
+   var OP_SUB = {ctor: "OP_SUB"};
+   var OP_ADD = {ctor: "OP_ADD"};
+   var stringToElem = function (s) {
+      var _p48 = s;
+      switch (_p48)
+      {case "+": return $Result.Ok(ELEM_OP(OP_ADD));
+         case "-": return $Result.Ok(ELEM_OP(OP_SUB));
+         case "*": return $Result.Ok(ELEM_OP(OP_MUL));
+         case "/": return $Result.Ok(ELEM_OP(OP_DIV));
+         case "^": return $Result.Ok(ELEM_OP(OP_EXP));
+         case "(": return $Result.Ok(ELEM_OP(OP_LPAR));
+         case "~(": return $Result.Ok(ELEM_OP(OP_NPAR));
+         case ")": return $Result.Ok(ELEM_OP(OP_RPAR));
+         case "x": return $Result.Ok(ELEM_EVAL(EVAR));
+         case "~x": return $Result.Ok(ELEM_EVAL(NEVAL(EVAR)));
+         default: var r = $String.toFloat(s);
+           var _p49 = r;
+           if (_p49.ctor === "Ok") {
+                 return $Result.Ok(ELEM_EVAL(EVAL(_p49._0)));
+              } else {
+                 var r2 = $String.toFloat(A2($String.dropLeft,1,s));
+                 var _p50 = r2;
+                 if (_p50.ctor === "Ok") {
+                       return $Result.Ok(ELEM_EVAL(NEVAL(EVAL(_p50._0))));
+                    } else {
+                       return $Result.Err(s);
+                    }
+              }}
+   };
+   var buildEvalStack = F3(function (d,ces,ls) {
+      buildEvalStack: while (true) {
+         var _p51 = ls;
+         if (_p51.ctor === "[]") {
+               return $Result.Ok(ces);
+            } else {
+               var _p55 = _p51._1;
+               var r = stringToElem(_p51._0);
+               var _p52 = r;
+               if (_p52.ctor === "Ok") {
+                     var _p54 = _p52._0;
+                     var _p53 = _p54;
+                     _v31_3: do {
+                        if (_p53.ctor === "ELEM_OP") {
+                              switch (_p53._0.ctor)
+                              {case "OP_NPAR": var nes = A3(openPar,d,true,ces);
+                                   var _v32 = d + 1,_v33 = nes,_v34 = _p55;
+                                   d = _v32;
+                                   ces = _v33;
+                                   ls = _v34;
+                                   continue buildEvalStack;
+                                 case "OP_LPAR": var nes = A3(openPar,d,false,ces);
+                                   var _v35 = d + 1,_v36 = nes,_v37 = _p55;
+                                   d = _v35;
+                                   ces = _v36;
+                                   ls = _v37;
+                                   continue buildEvalStack;
+                                 case "OP_RPAR": var _v38 = d - 1,_v39 = ces,_v40 = _p55;
+                                   d = _v38;
+                                   ces = _v39;
+                                   ls = _v40;
+                                   continue buildEvalStack;
+                                 default: break _v31_3;}
+                           } else {
+                              break _v31_3;
+                           }
+                     } while (false);
+                     var nes = A3(addEvalStack,d,_p54,ces);
+                     var _v41 = d,_v42 = nes,_v43 = _p55;
+                     d = _v41;
+                     ces = _v42;
+                     ls = _v43;
+                     continue buildEvalStack;
+                  } else {
+                     return $Result.Err(_p52._0);
+                  }
+            }
+      }
+   });
+   var buildFunction = function (ls) {
+      var r = A3(buildEvalStack,0,{ctor: "_Tuple2",_0: _U.list([]),_1: _U.list([])},ls);
+      var _p56 = r;
+      if (_p56.ctor === "Ok") {
+            var res = regroup(_p56._0);
+            var rf = stackToFunction(res);
+            var _p57 = rf;
+            if (_p57.ctor === "Ok") {
+                  return $Result.Ok(_p57._0);
+               } else {
+                  return $Result.Err(_p57._0);
+               }
+         } else {
+            return $Result.Err(_p56._0);
+         }
+   };
+   var stringToFunction = function (s) {    return buildFunction($Parsing.parseStringToCompute(s));};
+   var stringToResult = function (s) {
+      var func = stringToFunction(s);
+      var _p58 = func;
+      if (_p58.ctor === "Ok") {
+            return $Basics.toString(A2($eval,_p58._0,0));
+         } else {
+            return _p58._0;
+         }
+   };
+   var OP_VAR = {ctor: "OP_VAR"};
+   return _elm.Functions.values = {_op: _op
+                                  ,OP_VAR: OP_VAR
+                                  ,OP_ADD: OP_ADD
+                                  ,OP_SUB: OP_SUB
+                                  ,OP_MUL: OP_MUL
+                                  ,OP_DIV: OP_DIV
+                                  ,OP_EXP: OP_EXP
+                                  ,OP_LPAR: OP_LPAR
+                                  ,OP_RPAR: OP_RPAR
+                                  ,OP_NPAR: OP_NPAR
+                                  ,ELEM_EVAL: ELEM_EVAL
+                                  ,ELEM_OP: ELEM_OP
+                                  ,NUM: NUM
+                                  ,NEG: NEG
+                                  ,VAR: VAR
+                                  ,ADD: ADD
+                                  ,SUB: SUB
+                                  ,MUL: MUL
+                                  ,DIV: DIV
+                                  ,EXP: EXP
+                                  ,STACK: STACK
+                                  ,NEVAL: NEVAL
+                                  ,EVAL: EVAL
+                                  ,EVAR: EVAR
+                                  ,$eval: $eval
+                                  ,stringToElem: stringToElem
+                                  ,appendEvalStack: appendEvalStack
+                                  ,openPar: openPar
+                                  ,addEvalStack: addEvalStack
+                                  ,buildEvalStack: buildEvalStack
+                                  ,composeFunction: composeFunction
+                                  ,evaluableToFunction: evaluableToFunction
+                                  ,regroupEval: regroupEval
+                                  ,regroup: regroup
+                                  ,stackToFunction: stackToFunction
+                                  ,buildFunction: buildFunction
+                                  ,stringToFunction: stringToFunction
+                                  ,stringToResult: stringToResult};
+};

@@ -1,0 +1,395 @@
+Elm.Interface = Elm.Interface || {};
+Elm.Interface.make = function (_elm) {
+   "use strict";
+   _elm.Interface = _elm.Interface || {};
+   if (_elm.Interface.values) return _elm.Interface.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Functions = Elm.Functions.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $Graphics$Input = Elm.Graphics.Input.make(_elm),
+   $Graphing = Elm.Graphing.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Parsing = Elm.Parsing.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $Text = Elm.Text.make(_elm),
+   $Time = Elm.Time.make(_elm),
+   $Window = Elm.Window.make(_elm);
+   var _op = {};
+   var gmString = function (b) {
+      return $Basics.not(b) ? A2($Basics._op["++"],"INPUT:","  ") : A2($Basics._op["++"],"         INPUT:",A2($Basics._op["++"],"  ","    y ="));
+   };
+   var toStringMinusQuotes = function (s) {    return A2($String.dropRight,1,A2($String.dropLeft,1,$Basics.toString(s)));};
+   var vspace = A2($Graphics$Element.spacer,5,5);
+   var arrowButtonShape = F2(function (size,stretchFactor) {
+      var sizeify = function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: size * _p1._0,_1: size * _p1._1};};
+      var stretchify = function (_p2) {    var _p3 = _p2;return {ctor: "_Tuple2",_0: stretchFactor * _p3._0,_1: _p3._1};};
+      var sizeUp = function (_p4) {    return stretchify(sizeify(_p4));};
+      return $Graphics$Collage.polygon(A2($List.map,
+      sizeUp,
+      _U.list([{ctor: "_Tuple2",_0: 0.5,_1: 0.866}
+              ,{ctor: "_Tuple2",_0: 1,_1: 0}
+              ,{ctor: "_Tuple2",_0: 0.5,_1: -0.866}
+              ,{ctor: "_Tuple2",_0: -0.5,_1: -0.866}
+              ,{ctor: "_Tuple2",_0: -1,_1: 0}
+              ,{ctor: "_Tuple2",_0: -0.5,_1: 0.866}])));
+   });
+   var Input = F2(function (a,b) {    return {returnKey: a,delta: b};});
+   var Point = F2(function (a,b) {    return {x: a,y: b};});
+   var darkPink = A3($Color.rgb,255,50,147);
+   var lightPink = A3($Color.rgb,255,182,193);
+   var arrowBtnH = 47;
+   var arrowBtnW = 94;
+   var btnH = 44;
+   var btnW = 44;
+   var captionH = 47;
+   var captionW = 720;
+   var graphGridH = $Graphing.graphGridH;
+   var graphGridW = $Graphing.graphGridW;
+   var captionStrStyle = function (_p5) {
+      return $Graphics$Element.leftAligned(A2($Text.color,$Color.white,$Text.italic(A2($Text.height,13,$Text.fromString(_p5)))));
+   };
+   var buttonLineStyle = _U.update($Graphics$Collage.defaultLine,{color: darkPink,width: 2});
+   var spacerLineStyle = _U.update($Graphics$Collage.defaultLine,{color: lightPink,width: 3});
+   var lineStyle = _U.update($Graphics$Collage.defaultLine,{color: darkPink,width: 3});
+   var thickerLineStyle = _U.update($Graphics$Collage.defaultLine,{color: darkPink,width: 4});
+   var strStyle = function (_p6) {    return $Graphics$Element.centered(A2($Text.color,$Color.white,A2($Text.height,14,$Text.fromString(_p6))));};
+   var myButton = F2(function (msg,s) {
+      var drawButton = function (c) {
+         return A3($Graphics$Collage.collage,
+         btnW,
+         btnH,
+         _U.list([A2($Graphics$Collage.filled,c,A2($Graphics$Collage.ngon,6,21))
+                 ,A2($Graphics$Collage.outlined,buttonLineStyle,A2($Graphics$Collage.ngon,6,21))
+                 ,$Graphics$Collage.toForm(strStyle(s))]));
+      };
+      return A4($Graphics$Input.customButton,msg,drawButton(lightPink),drawButton(darkPink),drawButton($Color.grey));
+   });
+   var arrowButton = F2(function (msg,s) {
+      var drawButton = function (c) {
+         return A3($Graphics$Collage.collage,
+         arrowBtnW,
+         arrowBtnH,
+         _U.list([A2($Graphics$Collage.filled,c,A2(arrowButtonShape,20,2))
+                 ,A2($Graphics$Collage.outlined,lineStyle,A2(arrowButtonShape,20,2))
+                 ,$Graphics$Collage.toForm(strStyle(s))]));
+      };
+      return A4($Graphics$Input.customButton,msg,drawButton(lightPink),drawButton(darkPink),drawButton($Color.grey));
+   });
+   var rectButton = F2(function (msg,s) {
+      var drawButton = function (c) {
+         return A3($Graphics$Collage.collage,
+         50,
+         30,
+         _U.list([A2($Graphics$Collage.filled,c,A2($Graphics$Collage.rect,50,30))
+                 ,A2($Graphics$Collage.outlined,thickerLineStyle,A2($Graphics$Collage.rect,50,30))
+                 ,$Graphics$Collage.toForm(strStyle(s))]));
+      };
+      return A4($Graphics$Input.customButton,msg,drawButton(lightPink),drawButton(darkPink),drawButton($Color.grey));
+   });
+   var bigButton = F2(function (msg,s) {
+      var drawButton = function (c) {
+         return A3($Graphics$Collage.collage,
+         100,
+         60,
+         _U.list([A2($Graphics$Collage.filled,c,A2($Graphics$Collage.rect,100,60))
+                 ,A2($Graphics$Collage.outlined,thickerLineStyle,A2($Graphics$Collage.rect,100,60))
+                 ,$Graphics$Collage.toForm(strStyle(s))]));
+      };
+      return A4($Graphics$Input.customButton,msg,drawButton(lightPink),drawButton(darkPink),drawButton($Color.grey));
+   });
+   var upstate = F2(function (e,_p7) {
+      var _p8 = _p7;
+      var _p16 = _p8._1;
+      var _p15 = _p8._2;
+      var _p14 = _p8._3;
+      var _p13 = _p8._0;
+      var _p9 = e;
+      switch (_p9.ctor)
+      {case "PLU": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16," + "),_2: _p15,_3: _p14};
+         case "MIN": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16," - "),_2: _p15,_3: _p14};
+         case "DIV": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16," / "),_2: _p15,_3: _p14};
+         case "TIM": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16," * "),_2: _p15,_3: _p14};
+         case "Clear": return {ctor: "_Tuple4",_0: false,_1: "",_2: "",_3: A2($Graphing.graphUpstate,$Graphing.CLEAR,_p14)};
+         case "Zero": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"0"),_2: _p15,_3: _p14};
+         case "One": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"1"),_2: _p15,_3: _p14};
+         case "Two": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"2"),_2: _p15,_3: _p14};
+         case "Three": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"3"),_2: _p15,_3: _p14};
+         case "Four": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"4"),_2: _p15,_3: _p14};
+         case "Five": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"5"),_2: _p15,_3: _p14};
+         case "Six": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"6"),_2: _p15,_3: _p14};
+         case "Seven": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"7"),_2: _p15,_3: _p14};
+         case "Eight": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"8"),_2: _p15,_3: _p14};
+         case "Nine": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"9"),_2: _p15,_3: _p14};
+         case "Compute": var _p10 = _p13;
+           if (_p10 === true) {
+                 return {ctor: "_Tuple4",_0: _p13,_1: _p16,_2: "",_3: A2($Graphing.graphUpstate,A2($Graphing.GRAPH,_p16,$Basics.snd(_p14)),_p14)};
+              } else {
+                 return {ctor: "_Tuple4",_0: _p13,_1: "",_2: $Functions.stringToResult(_p16),_3: _p14};
+              }
+         case "LPAR": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"( "),_2: _p15,_3: _p14};
+         case "RPAR": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16," ) "),_2: _p15,_3: _p14};
+         case "PM": return {ctor: "_Tuple4",_0: _p13,_1: $Parsing.plusOrMin(_p16),_2: _p15,_3: _p14};
+         case "DEC": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,"."),_2: _p15,_3: _p14};
+         case "DEL": return {ctor: "_Tuple4",_0: _p13,_1: $Parsing.backspace(_p16),_2: _p15,_3: _p14};
+         case "ANS": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16,A2($Basics._op["++"]," ",_p15)),_2: _p15,_3: _p14};
+         case "YEQ": return {ctor: "_Tuple4",_0: $Basics.not(_p13) || $Parsing.stringContainsX(_p16),_1: _p16,_2: _p15,_3: _p14};
+         case "XVAR": return {ctor: "_Tuple4",_0: true,_1: A2($Basics._op["++"],_p16,"x"),_2: _p15,_3: _p14};
+         case "CARAT": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16," ^ "),_2: _p15,_3: _p14};
+         case "INV": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16," ^ ( -1 )"),_2: _p15,_3: _p14};
+         case "SRT": return {ctor: "_Tuple4",_0: _p13,_1: A2($Basics._op["++"],_p16," ^ ( 1 / 2 )"),_2: _p15,_3: _p14};
+         case "ZOOMIN": var _p11 = $Basics.snd(_p14);
+           var left = _p11._0;
+           var right = _p11._1;
+           if (_U.cmp(right,2.0) < 0) return {ctor: "_Tuple4",_0: _p13,_1: _p16,_2: "",_3: _p14}; else {
+                 var newRange = {ctor: "_Tuple2",_0: left + 2,_1: right - 2};
+                 return {ctor: "_Tuple4",_0: _p13,_1: _p16,_2: "",_3: A2($Graphing.graphUpstate,A2($Graphing.GRAPH,_p16,newRange),_p14)};
+              }
+         default: var _p12 = $Basics.snd(_p14);
+           var left = _p12._0;
+           var right = _p12._1;
+           if (_U.cmp(right,15.0) > 0) return {ctor: "_Tuple4",_0: _p13,_1: _p16,_2: "",_3: _p14}; else {
+                 var newRange = {ctor: "_Tuple2",_0: left - 2,_1: right + 2};
+                 return {ctor: "_Tuple4",_0: _p13,_1: _p16,_2: "",_3: A2($Graphing.graphUpstate,A2($Graphing.GRAPH,_p16,newRange),_p14)};
+              }}
+   });
+   var initInputState = {ctor: "_Tuple4",_0: false,_1: "",_2: "",_3: $Graphing.initGraphState};
+   var Clear = {ctor: "Clear"};
+   var buttonMailbox = $Signal.mailbox(Clear);
+   var stateOverTime = A3($Signal.foldp,upstate,initInputState,buttonMailbox.signal);
+   var clearButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Clear),"ac");
+   var Compute = {ctor: "Compute"};
+   var computeButton = A2(bigButton,A2($Signal.message,buttonMailbox.address,Compute),"> compute <");
+   var Nine = {ctor: "Nine"};
+   var nineButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Nine),"9");
+   var Eight = {ctor: "Eight"};
+   var eightButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Eight),"8");
+   var Seven = {ctor: "Seven"};
+   var sevenButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Seven),"7");
+   var Six = {ctor: "Six"};
+   var sixButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Six),"6");
+   var Five = {ctor: "Five"};
+   var fiveButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Five),"5");
+   var Four = {ctor: "Four"};
+   var fourButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Four),"4");
+   var Three = {ctor: "Three"};
+   var threeButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Three),"3");
+   var Two = {ctor: "Two"};
+   var twoButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Two),"2");
+   var One = {ctor: "One"};
+   var oneButton = A2(myButton,A2($Signal.message,buttonMailbox.address,One),"1");
+   var Zero = {ctor: "Zero"};
+   var zeroButton = A2(myButton,A2($Signal.message,buttonMailbox.address,Zero),"0");
+   var RPAR = {ctor: "RPAR"};
+   var rparButton = A2(myButton,A2($Signal.message,buttonMailbox.address,RPAR),")");
+   var LPAR = {ctor: "LPAR"};
+   var lparButton = A2(myButton,A2($Signal.message,buttonMailbox.address,LPAR),"(");
+   var DEC = {ctor: "DEC"};
+   var decimalButton = A2(myButton,A2($Signal.message,buttonMailbox.address,DEC),".");
+   var PM = {ctor: "PM"};
+   var pmButton = A2(myButton,A2($Signal.message,buttonMailbox.address,PM),"+/-");
+   var TIM = {ctor: "TIM"};
+   var timesButton = A2(myButton,A2($Signal.message,buttonMailbox.address,TIM),"*");
+   var DIV = {ctor: "DIV"};
+   var divButton = A2(myButton,A2($Signal.message,buttonMailbox.address,DIV),"/");
+   var MIN = {ctor: "MIN"};
+   var minButton = A2(myButton,A2($Signal.message,buttonMailbox.address,MIN),"-");
+   var PLU = {ctor: "PLU"};
+   var plusButton = A2(myButton,A2($Signal.message,buttonMailbox.address,PLU),"+");
+   var DEL = {ctor: "DEL"};
+   var delButton = A2(myButton,A2($Signal.message,buttonMailbox.address,DEL),"del");
+   var ANS = {ctor: "ANS"};
+   var ansButton = A2(rectButton,A2($Signal.message,buttonMailbox.address,ANS),"ans");
+   var YEQ = {ctor: "YEQ"};
+   var yeqButton = A2(rectButton,A2($Signal.message,buttonMailbox.address,YEQ),"y = ");
+   var XVAR = {ctor: "XVAR"};
+   var xButton = A2(rectButton,A2($Signal.message,buttonMailbox.address,XVAR),"x");
+   var SRT = {ctor: "SRT"};
+   var sqrtButton = A2(myButton,A2($Signal.message,buttonMailbox.address,SRT),"sqrt");
+   var INV = {ctor: "INV"};
+   var invButton = A2(myButton,A2($Signal.message,buttonMailbox.address,INV),"inv");
+   var CARAT = {ctor: "CARAT"};
+   var caratButton = A2(myButton,A2($Signal.message,buttonMailbox.address,CARAT),"^");
+   var ZOOMOUT = {ctor: "ZOOMOUT"};
+   var zoomOutButton = A2(rectButton,A2($Signal.message,buttonMailbox.address,ZOOMOUT),"-");
+   var ZOOMIN = {ctor: "ZOOMIN"};
+   var zoomInButton = A2(rectButton,A2($Signal.message,buttonMailbox.address,ZOOMIN),"+");
+   var view = F2(function (inputState,_p17) {
+      var _p18 = _p17;
+      var _p21 = _p18._0;
+      var _p20 = _p18._1;
+      var _p19 = inputState;
+      var graphModeToggle = _p19._0;
+      var stringToCompute = _p19._1;
+      var stringResult = _p19._2;
+      var graphState = _p19._3;
+      var graphModeStr = gmString(graphModeToggle);
+      var squareSpacer = A3($Graphics$Collage.collage,btnW,btnH,_U.list([A2($Graphics$Collage.outlined,spacerLineStyle,A2($Graphics$Collage.rect,60,70))]));
+      var smallSpacer = A3($Graphics$Collage.collage,70,40,_U.list([A2($Graphics$Collage.outlined,spacerLineStyle,A2($Graphics$Collage.rect,70,40))]));
+      var tinySpacer = A3($Graphics$Collage.collage,20,40,_U.list([A2($Graphics$Collage.outlined,spacerLineStyle,A2($Graphics$Collage.rect,20,40))]));
+      var tallSquareSpacer = A3($Graphics$Collage.collage,
+      btnW,
+      btnH,
+      _U.list([A2($Graphics$Collage.outlined,spacerLineStyle,A2($Graphics$Collage.rect,60,300))]));
+      var toCompute = A3($Graphics$Collage.collage,
+      captionW,
+      captionH,
+      _U.list([$Graphics$Collage.toForm(A4($Graphics$Element.container,
+              captionW,
+              captionH,
+              $Graphics$Element.middle,
+              strStyle(toStringMinusQuotes(stringToCompute))))
+              ,A2($Graphics$Collage.outlined,lineStyle,A2($Graphics$Collage.rect,captionW,captionH))
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: -327,_1: 0},$Graphics$Collage.toForm(captionStrStyle(graphModeStr)))]));
+      var resultBar = A3($Graphics$Collage.collage,
+      captionW,
+      captionH,
+      _U.list([$Graphics$Collage.toForm(A4($Graphics$Element.container,captionW,captionH,$Graphics$Element.middle,strStyle(toStringMinusQuotes(stringResult))))
+              ,A2($Graphics$Collage.outlined,lineStyle,A2($Graphics$Collage.rect,captionW,captionH))
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: -327,_1: 0},$Graphics$Collage.toForm(captionStrStyle("RESULT")))]));
+      var graph = $Graphing.graphPoints(graphState);
+      var graphPane = A3($Graphics$Collage.collage,
+      graphGridW,
+      graphGridH,
+      _U.list([A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 20,_1: -20},graph)
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 20,_1: -20},$Graphing.drawAxes($Basics.snd(graphState)))
+              ,A2($Graphics$Collage.outlined,lineStyle,A2($Graphics$Collage.rect,graphGridW,graphGridH))
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: -305,_1: 267},$Graphics$Collage.toForm(captionStrStyle("GRAPH OUTPUT:")))]));
+      var spacerColumn = A2($Graphics$Element.flow,
+      $Graphics$Element.down,
+      A2($List.intersperse,vspace,_U.list([squareSpacer,squareSpacer,squareSpacer,squareSpacer])));
+      var topRow = A2($Graphics$Element.flow,$Graphics$Element.right,A2($List.intersperse,vspace,_U.list([tinySpacer,tinySpacer,yeqButton,xButton,ansButton])));
+      var secondRow = A2($Graphics$Element.flow,
+      $Graphics$Element.right,
+      A2($List.intersperse,vspace,_U.list([tinySpacer,clearButton,delButton,lparButton,rparButton])));
+      var column1 = A2($Graphics$Element.flow,$Graphics$Element.down,A2($List.intersperse,vspace,_U.list([pmButton,oneButton,fourButton])));
+      var column2 = A2($Graphics$Element.flow,$Graphics$Element.down,A2($List.intersperse,vspace,_U.list([invButton,twoButton,fiveButton])));
+      var column3 = A2($Graphics$Element.flow,$Graphics$Element.down,A2($List.intersperse,vspace,_U.list([sqrtButton,threeButton,sixButton])));
+      var column4 = A2($Graphics$Element.flow,$Graphics$Element.down,A2($List.intersperse,vspace,_U.list([caratButton,plusButton,zeroButton])));
+      var column5 = A2($Graphics$Element.flow,$Graphics$Element.down,A2($List.intersperse,vspace,_U.list([minButton,divButton,timesButton])));
+      var columns = A2($Graphics$Element.flow,$Graphics$Element.right,A2($List.intersperse,vspace,_U.list([column1,column2,column3,column4,column5])));
+      var penultimateRow = A2($Graphics$Element.flow,
+      $Graphics$Element.right,
+      A2($List.intersperse,vspace,_U.list([tinySpacer,sevenButton,eightButton,nineButton,decimalButton])));
+      var bottomRow = A2($Graphics$Element.flow,$Graphics$Element.right,A2($List.intersperse,vspace,_U.list([tinySpacer,tinySpacer,tinySpacer,computeButton])));
+      var rangeString = A2($Basics._op["++"],
+      "Range: ",
+      A2($Basics._op["++"],
+      "(",
+      A2($Basics._op["++"],
+      $Basics.toString($Basics.fst($Basics.snd(graphState))),
+      A2($Basics._op["++"]," , ",A2($Basics._op["++"],$Basics.toString($Basics.snd($Basics.snd(graphState))),")")))));
+      var zoomRow = A2($Graphics$Element.flow,
+      $Graphics$Element.right,
+      A2($List.intersperse,vspace,_U.list([zoomOutButton,tinySpacer,captionStrStyle(rangeString),tinySpacer,zoomInButton])));
+      var buttonGrid = A3($Graphics$Collage.collage,
+      400,
+      671,
+      _U.list([A2($Graphics$Collage.outlined,lineStyle,A2($Graphics$Collage.rect,400,671))
+              ,$Graphics$Collage.toForm(A2($Graphics$Element.flow,
+              $Graphics$Element.down,
+              A2($List.intersperse,vspace,_U.list([topRow,secondRow,columns,penultimateRow,bottomRow,zoomRow]))))]));
+      var outputGrid = A2($Graphics$Element.flow,$Graphics$Element.down,A2($List.intersperse,vspace,_U.list([toCompute,resultBar,graphPane])));
+      var calcGrid = A2($Graphics$Element.flow,$Graphics$Element.right,A2($List.intersperse,vspace,_U.list([buttonGrid,outputGrid])));
+      var fullLayout = A2($Graphics$Element.color,lightPink,A4($Graphics$Element.container,_p21,_p20,$Graphics$Element.middle,calcGrid));
+      return A3($Graphics$Collage.collage,_p21,_p20,_U.list([$Graphics$Collage.toForm(fullLayout)]));
+   });
+   var main = A3($Signal.map2,view,stateOverTime,$Window.dimensions);
+   return _elm.Interface.values = {_op: _op
+                                  ,ZOOMIN: ZOOMIN
+                                  ,ZOOMOUT: ZOOMOUT
+                                  ,CARAT: CARAT
+                                  ,INV: INV
+                                  ,SRT: SRT
+                                  ,XVAR: XVAR
+                                  ,YEQ: YEQ
+                                  ,ANS: ANS
+                                  ,DEL: DEL
+                                  ,PLU: PLU
+                                  ,MIN: MIN
+                                  ,DIV: DIV
+                                  ,TIM: TIM
+                                  ,PM: PM
+                                  ,DEC: DEC
+                                  ,LPAR: LPAR
+                                  ,RPAR: RPAR
+                                  ,Zero: Zero
+                                  ,One: One
+                                  ,Two: Two
+                                  ,Three: Three
+                                  ,Four: Four
+                                  ,Five: Five
+                                  ,Six: Six
+                                  ,Seven: Seven
+                                  ,Eight: Eight
+                                  ,Nine: Nine
+                                  ,Compute: Compute
+                                  ,Clear: Clear
+                                  ,initInputState: initInputState
+                                  ,upstate: upstate
+                                  ,strStyle: strStyle
+                                  ,thickerLineStyle: thickerLineStyle
+                                  ,lineStyle: lineStyle
+                                  ,spacerLineStyle: spacerLineStyle
+                                  ,buttonLineStyle: buttonLineStyle
+                                  ,captionStrStyle: captionStrStyle
+                                  ,graphGridW: graphGridW
+                                  ,graphGridH: graphGridH
+                                  ,captionW: captionW
+                                  ,captionH: captionH
+                                  ,btnW: btnW
+                                  ,btnH: btnH
+                                  ,arrowBtnW: arrowBtnW
+                                  ,arrowBtnH: arrowBtnH
+                                  ,lightPink: lightPink
+                                  ,darkPink: darkPink
+                                  ,Point: Point
+                                  ,Input: Input
+                                  ,arrowButtonShape: arrowButtonShape
+                                  ,myButton: myButton
+                                  ,arrowButton: arrowButton
+                                  ,rectButton: rectButton
+                                  ,bigButton: bigButton
+                                  ,buttonMailbox: buttonMailbox
+                                  ,plusButton: plusButton
+                                  ,minButton: minButton
+                                  ,divButton: divButton
+                                  ,timesButton: timesButton
+                                  ,zeroButton: zeroButton
+                                  ,oneButton: oneButton
+                                  ,twoButton: twoButton
+                                  ,threeButton: threeButton
+                                  ,fourButton: fourButton
+                                  ,fiveButton: fiveButton
+                                  ,sixButton: sixButton
+                                  ,sevenButton: sevenButton
+                                  ,eightButton: eightButton
+                                  ,nineButton: nineButton
+                                  ,clearButton: clearButton
+                                  ,computeButton: computeButton
+                                  ,pmButton: pmButton
+                                  ,decimalButton: decimalButton
+                                  ,lparButton: lparButton
+                                  ,rparButton: rparButton
+                                  ,delButton: delButton
+                                  ,ansButton: ansButton
+                                  ,yeqButton: yeqButton
+                                  ,xButton: xButton
+                                  ,caratButton: caratButton
+                                  ,invButton: invButton
+                                  ,sqrtButton: sqrtButton
+                                  ,zoomInButton: zoomInButton
+                                  ,zoomOutButton: zoomOutButton
+                                  ,vspace: vspace
+                                  ,toStringMinusQuotes: toStringMinusQuotes
+                                  ,gmString: gmString
+                                  ,view: view
+                                  ,stateOverTime: stateOverTime
+                                  ,main: main};
+};
