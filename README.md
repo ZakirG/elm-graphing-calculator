@@ -6,7 +6,8 @@ Project Team:  Zakir Gowani, Benjamin Rohrer
 <img src="./imgs/snapshot.png" alt="App Screenshot on Desktop" width="600" style="display:inline-block;text-align:center;margin:auto;"/>
 
 ##### Features:
-- Basic binary arithmetic operators are supported (+, -, *, / , ^), and a basic unary operator (~, negation). 
+- A custom recursive parsing system that respects parentheses and the order of operations
+- Basic binary arithmetic operators are supported (+, -, *, / , ^), and a basic unary operator (~, negation).
 - Graph mode toggle: when the “y=” string is shown in the INPUT panel, graph mode is toggled on; this means that the string in the INPUT panel will be graphed. Graph mode can either be toggled using the “y=” button or by including the variable x in the INPUT string.
 - A range interval is shown below the button layout; the buttons to either side either zoom in or zoom out on the displayed graph. We cap the maximum range at (-17,17); we cap the minimum range at (-1,1).
 
